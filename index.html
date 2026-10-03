@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Al-Hadaf | Conversation Control</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:#f5f7fa;
+  color:#182033;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.card{
+  width:100%;
+  max-width:520px;
+  background:#fff;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 12px 35px rgba(0,0,0,.08);
+}
+
+.brand{
+  font-weight:800;
+  letter-spacing:.4px;
+  color:#b88a2a;
+}
+
+.title{
+  margin:7px 0 5px;
+  font-size:25px;
+}
+
+.sub{
+  color:#667085;
+  margin-bottom:25px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:15px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  font-size:16px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#b88a2a;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:20px;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:14px;
+  font-size:16px;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.take{
+  background:#182033;
+  color:white;
+}
+
+.return{
+  background:#edf0f4;
+  color:#182033;
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.status{
+  margin-top:18px;
+  padding:13px 14px;
+  border-radius:10px;
+  background:#f5f7fa;
+  color:#475467;
+  min-height:46px;
+  line-height:1.4;
+}
+
+@media(max-width:420px){
+  .buttons{
+    grid-template-columns:1fr;
+  }
+  .card{
+    padding:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="card">
+
+  <div class="brand">AL-HADAF AL-HASM</div>
+
+  <div class="title">
+    Conversation Control
+  </div>
+
+  <div class="sub">
+    WhatsApp AI Assistant
+  </div>
+
+  <label for="number">
+    Client WhatsApp number
+  </label>
+
+  <input
+    id="number"
+    inputmode="numeric"
+    placeholder="Example: 14168399118"
+  >
+
+  <label for="key">
+    Control key
+  </label>
+
+  <input
+    id="key"
+    type="password"
+    autocomplete="off"
+    placeholder="Enter your control key"
+  >
+
+  <div class="buttons">
+
+    <button
+      class="take"
+      onclick="setMode('HUMAN_ACTIVE')"
+    >
+      Take Over
+    </button>
+
+    <button
+      class="return"
+      onclick="setMode('AI_ACTIVE')"
+    >
+      Return to AI
+    </button>
+
+  </div>
+
+  <div id="status" class="status">
+    Ready.
+  </div>
+
+</main>
+
+<script>
+
+const WEBHOOK_URL =
+"https://alhadafjo26.app.n8n.cloud/webhook/conversation_control";
+
+async function setMode(mode){
+
+  const number =
+    document.getElementById("number").value.trim();
+
+  const key =
+    document.getElementById("key").value;
+
+  const status =
+    document.getElementById("status");
+
+  const buttons =
+    document.querySelectorAll("button");
+
+  if(!number){
+    status.textContent =
+      "Please enter the client's WhatsApp number.";
+    return;
+  }
+
+  if(!key){
+    status.textContent =
+      "Please enter the control key.";
+    return;
+  }
+
+  buttons.forEach(
+    button => button.disabled = true
+  );
+
+  status.textContent = "Updating...";
+
+  try{
+
+    const response = await fetch(
+      WEBHOOK_URL,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json",
+          "X-Conversation-Control-Key":key
+        },
+
+        body:JSON.stringify({
+          whatsapp_number:number,
+          conversation_status:mode
+        })
+      }
+    );
+
+    if(!response.ok){
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    if(mode === "HUMAN_ACTIVE"){
+
+      status.textContent =
+        "✓ AI stopped for this client. Employee control is active.";
+
+    }else{
+
+      status.textContent =
+        "✓ AI is active again for this client.";
+
+    }
+
+  }catch(error){
+
+    status.textContent =
+      "Could not update the conversation. Check the key and connection.";
+
+  }finally{
+
+    buttons.forEach(
+      button => button.disabled = false
+    );
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
