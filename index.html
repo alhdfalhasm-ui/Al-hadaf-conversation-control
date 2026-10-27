@@ -4,267 +4,77 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Al-Hadaf | Conversation Control</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:#f5f7fa;
-  color:#182033;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-}
-
-.card{
-  width:100%;
-  max-width:520px;
-  background:#fff;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 12px 35px rgba(0,0,0,.08);
-}
-
-.brand{
-  font-weight:800;
-  letter-spacing:.4px;
-  color:#b88a2a;
-}
-
-.title{
-  margin:7px 0 5px;
-  font-size:25px;
-}
-
-.sub{
-  color:#667085;
-  margin-bottom:25px;
-}
-
-label{
-  display:block;
-  font-weight:700;
-  margin:15px 0 7px;
-}
-
-input{
-  width:100%;
-  padding:13px 14px;
-  border:1px solid #d0d5dd;
-  border-radius:10px;
-  font-size:16px;
-  outline:none;
-}
-
-input:focus{
-  border-color:#b88a2a;
-}
-
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:20px;
-}
-
-button{
-  border:0;
-  border-radius:10px;
-  padding:14px;
-  font-size:16px;
-  font-weight:750;
-  cursor:pointer;
-}
-
-.take{
-  background:#182033;
-  color:white;
-}
-
-.return{
-  background:#edf0f4;
-  color:#182033;
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.status{
-  margin-top:18px;
-  padding:13px 14px;
-  border-radius:10px;
-  background:#f5f7fa;
-  color:#475467;
-  min-height:46px;
-  line-height:1.4;
-}
-
-@media(max-width:420px){
-  .buttons{
-    grid-template-columns:1fr;
-  }
-  .card{
-    padding:22px;
-  }
-}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f5f7fa;color:#182033;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:560px;background:#fff;border-radius:20px;padding:30px;box-shadow:0 12px 35px rgba(0,0,0,.08)}
+.brand{font-weight:800;letter-spacing:.4px;color:#b88a2a}.title{margin:7px 0 5px;font-size:25px}.sub{color:#667085;margin-bottom:24px}
+label{display:block;font-weight:700;margin:15px 0 7px}input{width:100%;padding:13px 14px;border:1px solid #d0d5dd;border-radius:10px;font-size:16px;outline:none}input:focus{border-color:#b88a2a}
+.section{border-top:1px solid #eaecf0;margin-top:24px;padding-top:20px}.section h2{font-size:17px;margin:0 0 6px}.hint{color:#667085;font-size:14px;line-height:1.45;margin:0 0 14px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}button{border:0;border-radius:10px;padding:14px;font-size:15px;font-weight:750;cursor:pointer}.take{background:#182033;color:white}.return{background:#edf0f4;color:#182033}.global-stop{background:#8f2635;color:#fff}.global-resume{background:#e9f5ee;color:#175b35}button:disabled{opacity:.55;cursor:not-allowed}
+.status{margin-top:18px;padding:13px 14px;border-radius:10px;background:#f5f7fa;color:#475467;min-height:46px;line-height:1.4}.status.error{background:#fff0f0;color:#9b1c1c}.status.success{background:#ecfdf3;color:#166534}
+@media(max-width:420px){.buttons{grid-template-columns:1fr}.card{padding:22px}}
 </style>
 </head>
-
 <body>
-
 <main class="card">
-
   <div class="brand">AL-HADAF AL-HASM</div>
+  <div class="title">Conversation Control</div>
+  <div class="sub">WhatsApp AI Assistant</div>
 
-  <div class="title">
-    Conversation Control
-  </div>
+  <label for="number">Client WhatsApp number</label>
+  <input id="number" inputmode="numeric" placeholder="Example: 14168399118" autocomplete="tel">
+  <label for="key">Control key</label>
+  <input id="key" type="password" autocomplete="off" placeholder="Enter your control key">
 
-  <div class="sub">
-    WhatsApp AI Assistant
-  </div>
+  <section class="section" aria-labelledby="client-title">
+    <h2 id="client-title">One conversation</h2>
+    <p class="hint">Pause AI replies for the selected client, or return the conversation to AI.</p>
+    <div class="buttons">
+      <button class="take" onclick="setClientMode('HUMAN_ACTIVE')">Take Over</button>
+      <button class="return" onclick="setClientMode('AI_ACTIVE')">Return to AI</button>
+    </div>
+  </section>
 
-  <label for="number">
-    Client WhatsApp number
-  </label>
+  <section class="section" aria-labelledby="global-title">
+    <h2 id="global-title">All conversations</h2>
+    <p class="hint">Pause AI replies across all chats, or resume AI globally.</p>
+    <div class="buttons">
+      <button class="global-stop" onclick="setGlobalMode('HUMAN_ACTIVE')">Pause AI for everyone</button>
+      <button class="global-resume" onclick="setGlobalMode('AI_ACTIVE')">Resume AI for everyone</button>
+    </div>
+  </section>
 
-  <input
-    id="number"
-    inputmode="numeric"
-    placeholder="Example: 14168399118"
-  >
-
-  <label for="key">
-    Control key
-  </label>
-
-  <input
-    id="key"
-    type="password"
-    autocomplete="off"
-    placeholder="Enter your control key"
-  >
-
-  <div class="buttons">
-
-    <button
-      class="take"
-      onclick="setMode('HUMAN_ACTIVE')"
-    >
-      Take Over
-    </button>
-
-    <button
-      class="return"
-      onclick="setMode('AI_ACTIVE')"
-    >
-      Return to AI
-    </button>
-
-  </div>
-
-  <div id="status" class="status">
-    Ready.
-  </div>
-
+  <div id="status" class="status" role="status" aria-live="polite">Ready.</div>
 </main>
-
 <script>
-
-const WEBHOOK_URL =
-"https://alhadafjo26.app.n8n.cloud/webhook/conversation_control";
-
-async function setMode(mode){
-
-  const number =
-    document.getElementById("number").value.trim();
-
-  const key =
-    document.getElementById("key").value;
-
-  const status =
-    document.getElementById("status");
-
-  const buttons =
-    document.querySelectorAll("button");
-
-  if(!number){
-    status.textContent =
-      "Please enter the client's WhatsApp number.";
-    return;
-  }
-
-  if(!key){
-    status.textContent =
-      "Please enter the control key.";
-    return;
-  }
-
-  buttons.forEach(
-    button => button.disabled = true
-  );
-
-  status.textContent = "Updating...";
-
-  try{
-
-    const response = await fetch(
-      WEBHOOK_URL,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json",
-          "X-Conversation-Control-Key":key
-        },
-
-        body:JSON.stringify({
-          whatsapp_number:number,
-          conversation_status:mode
-        })
-      }
-    );
-
-    if(!response.ok){
-      throw new Error(
-        "HTTP " + response.status
-      );
-    }
-
-    if(mode === "HUMAN_ACTIVE"){
-
-      status.textContent =
-        "✓ AI stopped for this client. Employee control is active.";
-
-    }else{
-
-      status.textContent =
-        "✓ AI is active again for this client.";
-
-    }
-
-  }catch(error){
-
-    status.textContent =
-      "Could not update the conversation. Check the key and connection.";
-
-  }finally{
-
-    buttons.forEach(
-      button => button.disabled = false
-    );
-
-  }
-
+const WEBHOOK_URL="https://alhadafjo26.app.n8n.cloud/webhook/conversation_control";
+function setClientMode(mode){
+  const number=document.getElementById("number").value.trim();
+  if(!number){setStatus("Please enter the client's WhatsApp number.",true);return;}
+  sendMode({whatsapp_number:number,conversation_status:mode},mode,false);
 }
-
+function setGlobalMode(mode){
+  sendMode({whatsapp_number:"GLOBAL",conversation_status:mode},mode,true);
+}
+async function sendMode(payload,mode,isGlobal){
+  const key=document.getElementById("key").value;
+  if(!key){setStatus("Please enter the control key.",true);return;}
+  const buttons=document.querySelectorAll("button");
+  buttons.forEach(button=>button.disabled=true);
+  setStatus("Updating...");
+  try{
+    const response=await fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json","X-Conversation-Control-Key":key},body:JSON.stringify(payload)});
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    if(isGlobal){
+      setStatus(mode==="HUMAN_ACTIVE"?"✓ AI is paused for all conversations. Human control is active.":"✓ AI is active again for all conversations.",false,true);
+    }else{
+      setStatus(mode==="HUMAN_ACTIVE"?"✓ AI stopped for this client. Employee control is active.":"✓ AI is active again for this client.",false,true);
+    }
+  }catch(error){setStatus("Could not update AI control. Check the key and connection.",true);}
+  finally{buttons.forEach(button=>button.disabled=false);}
+}
+function setStatus(message,isError=false,isSuccess=false){const status=document.getElementById("status");status.textContent=message;status.className="status"+(isError?" error":isSuccess?" success":"");}
 </script>
-
 </body>
 </html>
